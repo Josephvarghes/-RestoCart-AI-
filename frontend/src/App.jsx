@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home.jsx";
 import Cart from "./pages/Cart.jsx";
-import Navbar from "./components/Navbar.jsx";
+import Navbar from "./components/Navbar.jsx"; 
+import ChatWidget from "./pages/ChatWidget";
 
 
 export default function App() {
@@ -11,16 +12,8 @@ return (
 <Routes>
 <Route path="/" element={<Home />} />
 <Route path="/cart" element={<Cart />} />
-</Routes>
+</Routes> 
+<ChatWidget />
 </BrowserRouter>
 );
 } 
-// export default function App() {
-//   return (
-//     <div className="min-h-screen bg-red-500 flex items-center justify-center">
-//       <h1 className="text-6xl font-bold text-white">
-//         TAILWIND WORKING!
-//       </h1>
-//     </div>
-//   );
-// }
