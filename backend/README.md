@@ -38,8 +38,8 @@ Users can browse products, search, add to cart, place dummy orders, and ask an A
 
 ```bash
 # 1. Clone & enter project
-git clone https://github.com/your-username/restocart-ai.git
-cd restocart-ai
+git clone https://github.com/Josephvarghes/-RestoCart-AI-.git
+cd backend
 
 # 2. Set up Python environment
 python -m venv venv
@@ -53,4 +53,4 @@ pip install -r requirements.txt
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env
 
 # 5. Run server
-uvicorn app.main:app --reload
+uvicorn main:app --reload --port 8000
