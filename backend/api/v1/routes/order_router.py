@@ -7,6 +7,7 @@ from services.order_service import OrderService
 
 router = APIRouter()
 
+
 def get_db():
     db = SessionLocal()
     try:
@@ -14,8 +15,8 @@ def get_db():
     finally:
         db.close()
 
+
 @router.post("/", response_model=OrderResponse)
 def place_order(payload: OrderCreate, db: Session = Depends(get_db)):
     OrderService.create_order(db, payload.product_ids)
     return {"status": "success", "message": "Order placed!"}
-

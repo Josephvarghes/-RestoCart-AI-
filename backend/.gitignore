@@ -12,6 +12,6 @@ ENV/
 *.sqlite3
 
 
-resto/ 
+resto/
 
 chroma_db/

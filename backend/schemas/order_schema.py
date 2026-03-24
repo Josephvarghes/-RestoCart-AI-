@@ -1,8 +1,9 @@
 from pydantic import BaseModel
-from typing import List
+
 
 class OrderCreate(BaseModel):
-    product_ids: List[int]
+    product_ids: list[int]
+
 
 class OrderResponse(BaseModel):
     status: str

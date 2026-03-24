@@ -1,15 +1,13 @@
-from typing import List
-from sqlalchemy.orm import Session
-from models.product_model import Product
-from .embeddings import get_embeddings
 import chromadb
 from chromadb.utils import embedding_functions
 
 CHROMA_PATH = "chroma_db"
 COLLECTION_NAME = "products"
 
+
 def get_chroma_client():
     return chromadb.PersistentClient(path=CHROMA_PATH)
+
 
 def get_or_create_collection():
     client = get_chroma_client()
@@ -19,24 +17,24 @@ def get_or_create_collection():
     collection = client.get_or_create_collection(
         name=COLLECTION_NAME,
         embedding_function=embedding_func,
-        metadata={"hnsw:space": "cosine"}
+        metadata={"hnsw:space": "cosine"},
     )
     return collection
 
-def semantic_search(query: str, top_k: int = 3) -> List[dict]:
+
+def semantic_search(query: str, top_k: int = 3) -> list[dict]:
     collection = get_or_create_collection()
-    results = collection.query(
-        query_texts=[query],
-        n_results=top_k
-    )
-    
+    results = collection.query(query_texts=[query], n_results=top_k)
+
     docs = []
-    for i, doc in enumerate(results['documents'][0]):
+    for i, _ in enumerate(results["documents"][0]):
         # Reconstruct product-like object from metadata
-        meta = results['metadatas'][0][i]
-        docs.append({
-            "name": meta["name"],
-            "description": meta["description"],
-            "price": meta["price"]
-        })
+        meta = results["metadatas"][0][i]
+        docs.append(
+            {
+                "name": meta["name"],
+                "description": meta["description"],
+                "price": meta["price"],
+            }
+        )
     return docs

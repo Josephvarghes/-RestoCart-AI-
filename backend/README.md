@@ -1,6 +1,6 @@
 # RestoCart AI
 
-A simplified e-commerce demo built for the **RestoPulse Junior Fullstack Engineer** assignment.  
+A simplified e-commerce demo built for the **RestoPulse Junior Fullstack Engineer** assignment.
 Users can browse products, search, add to cart, place dummy orders, and ask an AI assistant questions about products—powered by **Groq + LangChain**.
 
 > ⚠️ **No authentication, payments, or user accounts** — as per assignment constraints.
