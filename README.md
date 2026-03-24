@@ -33,6 +33,19 @@ Users can browse products, search, add to cart, place dummy orders, and chat wit
 
 ---
 
+## 🤖 Agent Automation
+
+This project includes an **`.agents`** directory designed for AI assistants (like Antigravity) to handle project management, setup, and execution seamlessly.
+
+- **/setup**: Automatically sets up the backend (venv + pip) and frontend (npm install).
+- **/run**: Launches both the FastAPI and Vite development servers.
+- **/all**: One command to rule them all — setup and run everything.
+
+> [!TIP]
+> Use these workflows to maintain a consistent developer experience across environments.
+
+---
+
 ## 🚀 Local Setup
 
 ### Prerequisites

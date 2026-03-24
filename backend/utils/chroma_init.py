@@ -26,8 +26,8 @@ def init_chroma_db():
                 documents=documents,
                 metadatas=metadatas
             )
-            print(f"✅ ChromaDB populated with {len(products)} products")
+            print(f"[OK] ChromaDB populated with {len(products)} products")
         else:
-            print("✅ ChromaDB already initialized")
+            print("[OK] ChromaDB already initialized")
     finally:
         db.close()
