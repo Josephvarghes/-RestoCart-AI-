@@ -8,64 +8,84 @@ def seed_sample_products():
         if db.query(Product).first() is None:
             sample_products = [
                 {
-                    "name": "Wireless Mouse",
-                    "description": "Smooth control",
-                    "price": 499,
-                    "category": "Electronics",
+                    "name": "Classic Veg Burger",
+                    "description": "Crispy veg patty with lettuce and cheese",
+                    "price": 149,
+                    "category": "Burgers",
+                    "stock": 15,
+                    "is_available": 1
                 },
                 {
-                    "name": "Gaming Keyboard",
-                    "description": "RGB lighting",
-                    "price": 1599,
-                    "category": "Electronics",
-                },
-                {
-                    "name": "Bluetooth Speaker",
-                    "description": "Deep bass",
-                    "price": 999,
-                    "category": "Audio",
-                },
-                {
-                    "name": "USB-C Cable",
-                    "description": "Fast charging",
+                    "name": "Chicken Cheese Burger",
+                    "description": "Grilled chicken patty with extra cheese",
                     "price": 199,
-                    "category": "Accessories",
+                    "category": "Burgers",
+                    "stock": 10,
+                    "is_available": 1
                 },
                 {
-                    "name": "Laptop Stand",
-                    "description": "Ergonomic design",
-                    "price": 699,
-                    "category": "Office",
-                },
-                {
-                    "name": "Water Bottle",
-                    "description": "Hot & cold",
+                    "name": "Margherita Pizza",
+                    "description": "Classic tomato and mozzarella",
                     "price": 299,
-                    "category": "Lifestyle",
+                    "category": "Pizzas",
+                    "stock": 5,
+                    "is_available": 1
                 },
                 {
-                    "name": "Notebook",
-                    "description": "200 pages",
+                    "name": "Pepperoni Feast",
+                    "description": "Loaded with spicy pepperoni and cheese",
+                    "price": 449,
+                    "category": "Pizzas",
+                    "stock": 0,  # Mocking out of stock for testing
+                    "is_available": 0
+                },
+                {
+                    "name": "Hyderabadi Chicken Biryani",
+                    "description": "Authentic spicy dum biryani",
+                    "price": 349,
+                    "category": "Main Course",
+                    "stock": 20,
+                    "is_available": 1
+                },
+                {
+                    "name": "Paneer Butter Masala",
+                    "description": "Creamy tomato base with soft paneer cubes",
+                    "price": 279,
+                    "category": "Main Course",
+                    "stock": 12,
+                    "is_available": 1
+                },
+                {
+                    "name": "French Fries",
+                    "description": "Classic salted crispy fries",
                     "price": 99,
-                    "category": "Stationery",
+                    "category": "Sides",
+                    "stock": 30,
+                    "is_available": 1
                 },
                 {
-                    "name": "Desk Lamp",
-                    "description": "LED, low power",
-                    "price": 399,
-                    "category": "Home",
+                    "name": "Garlic Bread",
+                    "description": "Toasted bread with garlic butter and herbs",
+                    "price": 129,
+                    "category": "Sides",
+                    "stock": 25,
+                    "is_available": 1
                 },
                 {
-                    "name": "Pen Drive 32GB",
-                    "description": "High speed",
-                    "price": 699,
-                    "category": "Storage",
+                    "name": "Chocolate Lava Cake",
+                    "description": "Warm cake with a molten chocolate center",
+                    "price": 149,
+                    "category": "Desserts",
+                    "stock": 8,
+                    "is_available": 1
                 },
                 {
-                    "name": "Smart Watch",
-                    "description": "Fitness tracking",
-                    "price": 1999,
-                    "category": "Wearables",
+                    "name": "Fresh Lime Soda",
+                    "description": "Refreshing lemon drink with soda",
+                    "price": 79,
+                    "category": "Beverages",
+                    "stock": 40,
+                    "is_available": 1
                 },
             ]
 
@@ -73,7 +93,7 @@ def seed_sample_products():
                 db.add(Product(**p))
 
             db.commit()
-            print("Database seeded with 10 sample products!")
+            print("Database seeded with 10 restaurant products!")
         else:
             print("Database already has products – skipping seed.")
     except Exception as e:

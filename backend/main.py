@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1.routes import ai_router, order_router, product_route
 from db.base import Base
+# Register models
+from models.product_model import Product
+from models.order_model import Order
+from models.chat_model import ChatMessage
+
 from db.seed import seed_sample_products
 from db.session import engine
 from utils.chroma_init import init_chroma_db
