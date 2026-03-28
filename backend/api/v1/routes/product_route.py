@@ -8,12 +8,14 @@ from services.product_service import ProductService
 router = APIRouter()
 service = ProductService()
 
+
 def get_db():
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 @router.get("/", response_model=list[ProductResponse])
 def get_products(db: Session = Depends(get_db)):

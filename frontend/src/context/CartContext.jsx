@@ -10,16 +10,17 @@ const [cart, setCart] = useState([]);
 
 
 const addToCart = (product) => setCart([...cart, product]);
-const clearCart = () => setCart([]); 
+const clearCart = () => setCart([]);
 
 
 return (
 <CartContext.Provider value={{ cart, addToCart, clearCart }}>
 {children}
 </CartContext.Provider>
-); 
-}; 
+);
+}
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {

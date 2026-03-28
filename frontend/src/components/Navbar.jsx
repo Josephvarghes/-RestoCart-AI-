@@ -11,7 +11,7 @@ export default function Navbar() {
   return (
     <nav className="bg-gray-900 text-white p-4 flex justify-between items-center">
       <Link to="/" className="text-xl font-bold">RestoPulse Shop</Link>
-      
+
       <div className="flex items-center gap-2">
         <span className="text-sm">
           Cart: {totalItems} item{totalItems !== 1 ? "s" : ""} – ₹{totalPrice.toFixed(2)}

@@ -1,9 +1,9 @@
 # RestoCart AI – RestoPulse Assignment
 
-A simplified e-commerce demo built for the **RestoPulse Junior Fullstack Engineer** selection process.  
+A simplified e-commerce demo built for the **RestoPulse Junior Fullstack Engineer** selection process.
 Users can browse products, search, add to cart, place dummy orders, and chat with an **AI assistant powered by Groq + LangChain RAG**.
 
-> 🚫 **No authentication, payments, or user accounts** — as per assignment constraints.  
+> 🚫 **No authentication, payments, or user accounts** — as per assignment constraints.
 > ✅ **100% reproducible** with exact dependency versions.
 
 ---
@@ -37,7 +37,7 @@ Users can browse products, search, add to cart, place dummy orders, and chat wit
 
 This project includes an **`.agents`** directory designed for AI assistants (like Antigravity) to handle project management, setup, and execution seamlessly.
 
-- **/setup**: Automatically sets up the backend (venv + pip) and frontend (npm install).
+- **/setup**: Automatically sets up the backend (uv sync) and frontend (npm install).
 - **/run**: Launches both the FastAPI and Vite development servers.
 - **/all**: One command to rule them all — setup and run everything.
 
@@ -50,6 +50,7 @@ This project includes an **`.agents`** directory designed for AI assistants (lik
 
 ### Prerequisites
 - Python 3.9+
+- [uv](https://github.com/astral-sh/uv) (Recommended for Python)
 - Node.js 18+
 - [Groq API Key](https://console.groq.com/keys)
 
@@ -60,18 +61,30 @@ This project includes an **`.agents`** directory designed for AI assistants (lik
 ```bash
 # 1. Clone & enter project
 git clone https://github.com/Josephvarghes/-RestoCart-AI-.git
-cd restocart-ai
+cd -RestoCart-AI-
 
-# 2. Set up Python environment
-python -m venv resto
-source resto/bin/activate  # Linux/macOS
-# resto\Scripts\Activate.ps1  # Windows
+# 2. Set up environment and install dependencies with uv
+cd backend
+uv sync
 
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Configure environment
+# 3. Configure environment
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env
 
-# 5. Run server
-uvicorn main:app --reload --port 8000
+# 4. Run server
+uv run uvicorn main:app --reload --port 8000
+```
+
+---
+
+### 🎨 Frontend (React + Vite)
+
+```bash
+# 1. Enter frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Run development server
+npm run dev
+```

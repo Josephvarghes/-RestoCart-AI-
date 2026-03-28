@@ -8,8 +8,7 @@ This workflow runs both the FastAPI backend and the Vite frontend.
 
 ### 1. Run Backend
 1. Change directory to backend: `cd backend`
-2. Activate virtual environment (Windows): `.\venv\Scripts\Activate.ps1`
-3. Start the FastAPI server: `uvicorn main:app --reload --port 8000`
+2. Start the FastAPI server using uv: `uv run uvicorn main:app --reload --port 8000`
 
 ### 2. Run Frontend
 1. Change directory to frontend: `cd frontend`

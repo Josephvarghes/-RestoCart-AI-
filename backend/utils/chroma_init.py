@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
+
 from db.session import SessionLocal
 from models.product_model import Product
 from services.ai.retriever import get_or_create_collection
+
 
 def init_chroma_db():
     db: Session = SessionLocal()
@@ -14,18 +16,10 @@ def init_chroma_db():
             ids = [str(p.id) for p in products]
             documents = [f"{p.name}: {p.description}" for p in products]
             metadatas = [
-                {
-                    "name": p.name,
-                    "description": p.description,
-                    "price": p.price
-                }
+                {"name": p.name, "description": p.description, "price": p.price}
                 for p in products
             ]
-            collection.add(
-                ids=ids,
-                documents=documents,
-                metadatas=metadatas
-            )
+            collection.add(ids=ids, documents=documents, metadatas=metadatas)
             print(f"[OK] ChromaDB populated with {len(products)} products")
         else:
             print("[OK] ChromaDB already initialized")

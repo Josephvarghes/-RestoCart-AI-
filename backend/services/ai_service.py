@@ -43,15 +43,15 @@
 
 #         # FIX 3 → Grab content safely
 #         return response.content
-from langchain_groq import ChatGroq
 from langchain_core.messages import HumanMessage
+from langchain_groq import ChatGroq
 from sqlalchemy.orm import Session
-from models.product_model import Product
+
 from core.config import settings
 from services.ai.retriever import semantic_search  # ← NEW IMPORT
 
-class AIService:
 
+class AIService:
     @staticmethod
     def search_products(db: Session, query: str):
         """
@@ -68,10 +68,12 @@ class AIService:
             return "I couldn't find any products matching your query. Try asking about electronics, home goods, or fitness items!"
 
         # products is now list of dicts, not ORM objects
-        context = "\n".join([
-            f"- {p['name']}: {p['description']} (Price: ${p['price']})"
-            for p in products
-        ])
+        context = "\n".join(
+            [
+                f"- {p['name']}: {p['description']} (Price: ${p['price']})"
+                for p in products
+            ]
+        )
 
         prompt = f"""You are a helpful product assistant for RestoPulse.
 Answer the user's question using ONLY the product information below.
@@ -85,9 +87,7 @@ Question: {question}
 Answer:"""
 
         llm = ChatGroq(
-            model="llama-3.1-8b-instant",
-            api_key=settings.GROQ_API_KEY,
-            temperature=0.3
+            model="llama-3.1-8b-instant", api_key=settings.GROQ_API_KEY, temperature=0.3
         )
 
         response = llm.invoke([HumanMessage(content=prompt)])
