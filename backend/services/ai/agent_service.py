@@ -12,7 +12,7 @@ class AgentService:
     @staticmethod
     def get_agent_executor():
         llm = ChatGroq(
-            model="llama-3.1-70b-versatile",
+            model="llama-3.3-70b-versatile",  # Corrected from decommissioned llama-3.1-70b-versatile
             api_key=settings.GROQ_API_KEY,
             temperature=0.1
         )
