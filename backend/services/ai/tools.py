@@ -50,34 +50,97 @@ def fetch_kitchen_load() -> str:
 
 @tool
 def process_order(items_json: str) -> str:
-    """Finalizes and places the order in the system. Input is JSON string of items."""
-    # In a real app, this would deduct stock and create an Order record.
-    # For the demo, we'll simulate the success.
+    """
+    Finalizes and places the order in the system. 
+    Input: items_json (str) - A JSON string representing a list of items. 
+    Example: '[{"name": "Margherita Pizza", "quantity": 1}, {"name": "French Fries", "quantity": 2}]'
+    """
+    db = SessionLocal()
     try:
+        # AI might sometimes send the string with extra quotes or as a raw string
         items = json.loads(items_json)
-        # Mocking order processing
-        item_names = [f"{i['quantity']}x {i['name']}" for i in items]
-        return f"Order placed successfully: {', '.join(item_names)}. Sending to kitchen now."
+        if not items:
+            return "Error: No items provided in the order."
+            
+        order_ids = []
+        ordered_item_details = []
+        
+        # 1. Validation & Preparation
+        for raw_item in items:
+            # Defensive key extraction
+            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
+            quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
+            
+            if not name:
+                return f"Error: Item name missing in one of the products: {raw_item}"
+
+            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
+            if not product:
+                return f"Error: Product '{name}' not found in our menu."
+            
+            if product.stock < quantity:
+                return f"Error: Insufficient stock for '{product.name}'. Available: {product.stock}, Requested: {quantity}."
+            
+            # Map quantities to repeated IDs for the current CSV schema
+            for _ in range(quantity):
+                order_ids.append(str(product.id))
+            
+            ordered_item_details.append(f"{quantity}x {product.name}")
+        
+        # 2. Transactional Update
+        for raw_item in items:
+            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
+            quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
+            
+            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
+            product.stock -= quantity
+            if product.stock <= 0:
+                product.stock = 0
+                product.is_available = 0
+        
+        new_order = Order(
+            product_ids=",".join(order_ids)
+        )
+        db.add(new_order)
+        db.commit()
+        db.refresh(new_order)
+        
+        return f"Order placed successfully! Order ID: {new_order.id}. Items: {', '.join(ordered_item_details)}. I have sent this to the kitchen."
+    except json.JSONDecodeError:
+        return "Error: Invalid JSON format provided for items_json."
     except Exception as e:
+        db.rollback()
         return f"Error processing order: {str(e)}"
+    finally:
+        db.close()
 
 @tool
 def calculate_bill(items_json: str) -> str:
-    """Calculates the total bill amount including tax for the requested items."""
+    """
+    Calculates the total bill amount including tax for the requested items.
+    Input: items_json (str) - A JSON string representing a list of items and quantities.
+    Example: '[{"name": "Margherita Pizza", "quantity": 1}, {"name": "French Fries", "quantity": 2}]'
+    """
     db = SessionLocal()
     try:
         items = json.loads(items_json)
         total = 0
         details = []
-        for item in items:
-            product = db.query(Product).filter(Product.name.ilike(f"%{item['name']}%")).first()
+        for raw_item in items:
+            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
+            quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
+            
+            if not name:
+                continue
+
+            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
             if product:
-                item_total = product.price * item['quantity']
+                item_total = product.price * quantity
                 total += item_total
                 details.append({
                     "item": product.name,
                     "price": product.price,
-                    "quantity": item['quantity'],
+                    "quantity": quantity,
                     "subtotal": item_total
                 })
         
@@ -86,9 +149,11 @@ def calculate_bill(items_json: str) -> str:
         
         return json.dumps({
             "items": details,
-            "subtotal": total,
-            "tax": tax,
-            "grand_total": grand_total
+            "subtotal": round(total, 2),
+            "tax": round(tax, 2),
+            "grand_total": round(grand_total, 2)
         })
+    except Exception as e:
+        return f"Error calculating bill: {str(e)}. Please ensure items are in JSON format: '[{{\"name\": \"...\", \"quantity\": 1}}]'"
     finally:
         db.close()
