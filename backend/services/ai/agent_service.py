@@ -25,7 +25,7 @@ class AgentService:
             
             TOOL USAGE RULES:
             - When calling 'calculate_bill' or 'process_order', ALWAYS provide the input as a JSON string representing a list of items.
-            - FORMAT: '[{"name": "Dish Name", "quantity": 1}]'
+            - FORMAT: '[[{{"name": "Dish Name", "quantity": 1}}]]'
             - Use the EXACT names found in the menu.
             
             DECISION LOGIC:
