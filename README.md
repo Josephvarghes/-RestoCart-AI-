@@ -14,10 +14,12 @@ Users can browse products, search, add to cart, place dummy orders, and chat wit
 - 🔍 **Real-time search** (client-side + semantic backend fallback)
 - 🛒 **Add to Cart** with live summary in navbar: `Cart: 2 items – ₹145.74`
 - 📦 **Place Order**: sends product IDs to backend, saves to SQLite, clears cart
-- 🤖 **AI Chatbot**: answers questions using **real product data only** (no hallucination)
-  - Powered by **Groq LPU** (ultra-fast LLM inference)
-  - Uses **ChromaDB + sentence-transformers** for semantic retrieval
-  - Implements **Retrieval-Augmented Generation (RAG)**
+- 🤖 **AI Agent (Resto-Manager)**: A sophisticated assistant that manages the entire restaurant flow.
+  - **Tool-Enabled**: Can check real-time inventory, monitor kitchen load, calculate bills (with tax), and process orders.
+  - **Decision Logic**: Suggests alternatives when items are out of stock and warns about delays if the kitchen is busy.
+  - **Powered by Groq + LangChain**: Uses **Llama-3.3-70b-versatile** for reasoning and decision-making.
+  - **Memory Persistence**: Maintains chat history across sessions using SQLite.
+  - Implements **Retrieval-Augmented Generation (RAG)** for accurate product information.
 
 ---
 
@@ -26,7 +28,7 @@ Users can browse products, search, add to cart, place dummy orders, and chat wit
 | Layer       | Technology |
 |-------------|-----------|
 | **Backend** | FastAPI, SQLAlchemy, SQLite (`restopulse.db`) |
-| **AI**      | LangChain, Groq API, ChromaDB, `all-MiniLM-L6-v2` embeddings |
+| **AI**      | LangChain (Agents), Groq API (Llama-3.3-70b), ChromaDB, `all-MiniLM-L6-v2` |
 | **Frontend**| React 18, Vite, Tailwind CSS |
 | **State**   | React Context (Cart) |
 | **APIs**    | REST (`/api/v1/products`, `/api/v1/orders`, `/api/v1/ai/chat`) |
@@ -70,7 +72,10 @@ uv sync
 # 3. Configure environment
 echo "GROQ_API_KEY=your_groq_api_key_here" > .env
 
-# 4. Run server
+# 4. (Optional) Verify AI Agent
+uv run python verify_agent.py
+
+# 5. Run server
 uv run uvicorn main:app --reload --port 8000
 ```
 
