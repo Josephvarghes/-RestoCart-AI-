@@ -1,10 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [sessionId, setSessionId] = useState("");
+
+  useEffect(() => {
+    let id = localStorage.getItem("chat_session_id");
+    if (!id) {
+      id = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11);
+      localStorage.setItem("chat_session_id", id);
+    }
+    setSessionId(id);
+  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -18,7 +28,10 @@ export default function ChatWidget() {
       const res = await fetch("http://localhost:8000/api/v1/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: input }),
+        body: JSON.stringify({ 
+          question: input,
+          session_id: sessionId
+        }),
       });
 
       const data = await res.json();

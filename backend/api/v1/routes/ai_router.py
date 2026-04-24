@@ -19,7 +19,7 @@ def get_db():
 
 class ChatRequest(BaseModel):
     question: str
-    session_id: Optional[str] = "default_session"
+    session_id: str
 
 
 class ChatResponse(BaseModel):
