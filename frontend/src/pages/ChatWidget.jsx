@@ -10,6 +10,23 @@ export default function ChatWidget() {
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  const fetchHistory = useCallback(async () => {
+    if (!sessionId) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/v1/ai/history/${sessionId}`);
+      if (res.ok) {
+        const data = await res.json();
+        setMessages(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch chat history:", err);
+    }
+  }, [API_BASE_URL, sessionId]);
+
   // Initialize Session
   useEffect(() => {
     let id = localStorage.getItem("chat_session_id");
@@ -22,31 +39,14 @@ export default function ChatWidget() {
 
   // Fetch History when sessionId is ready
   useEffect(() => {
-    if (sessionId) {
-      fetchHistory();
-    }
-  }, [sessionId, fetchHistory]);
+    fetchHistory();
+  }, [fetchHistory]);
 
   // Auto-scroll to bottom
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isLoading]);
+  }, [messages, isLoading, scrollToBottom]);
 
-  const fetchHistory = useCallback(async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/api/v1/ai/history/${sessionId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setMessages(data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch chat history:", err);
-    }
-  }, [API_BASE_URL, sessionId]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
   const sendMessage = async () => {
     if (!input.trim()) return;
