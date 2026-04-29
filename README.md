@@ -1,9 +1,9 @@
-# RestoCart AI – RestoPulse Assignment
+# RestoCart AI
 
-A simplified e-commerce demo built for the **RestoPulse Junior Fullstack Engineer** selection process.
-Users can browse products, search, add to cart, place dummy orders, and chat with an **AI assistant powered by Groq + LangChain RAG**.
+An intelligent e-commerce and restaurant management system built around a sophisticated **AI agent powered by Groq + LangChain RAG**.
+Users can browse products, search, add to cart, place orders, and chat seamlessly with the AI assistant to manage restaurant operations.
 
-> 🚫 **No authentication, payments, or user accounts** — as per assignment constraints.
+> 🚫 **No authentication, payments, or user accounts** — focused entirely on demonstrating AI capabilities and agent workflows.
 > ✅ **100% reproducible** with exact dependency versions.
 
 ---
