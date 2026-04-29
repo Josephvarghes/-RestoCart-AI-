@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
+
 from models.chat_model import ChatMessage
+
 
 class ChatRepository:
     @staticmethod

@@ -3,13 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from api.v1.routes import ai_router, order_router, product_route
 from db.base import Base
-# Register models
-from models.product_model import Product
-from models.order_model import Order
-from models.chat_model import ChatMessage
-
 from db.seed import seed_sample_products
 from db.session import engine
+
+# Register models
 from utils.chroma_init import init_chroma_db
 
 Base.metadata.create_all(bind=engine)
@@ -18,7 +15,9 @@ app = FastAPI(title="RestoPulse Backend", version="1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Being more permissive for development to avoid localhost/127.0.0.1 mismatches
+    allow_origins=[
+        "*"
+    ],  # Being more permissive for development to avoid localhost/127.0.0.1 mismatches
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

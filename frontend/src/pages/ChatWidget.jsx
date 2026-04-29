@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,14 +25,14 @@ export default function ChatWidget() {
     if (sessionId) {
       fetchHistory();
     }
-  }, [sessionId]);
+  }, [sessionId, fetchHistory]);
 
   // Auto-scroll to bottom
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
 
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/api/v1/ai/history/${sessionId}`);
       if (res.ok) {
@@ -42,7 +42,7 @@ export default function ChatWidget() {
     } catch (err) {
       console.error("Failed to fetch chat history:", err);
     }
-  };
+  }, [API_BASE_URL, sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });

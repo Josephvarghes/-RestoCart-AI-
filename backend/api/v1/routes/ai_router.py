@@ -1,11 +1,10 @@
-from typing import List, Optional
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from db.session import SessionLocal
-from services.ai.agent_service import AgentService
 from repositories.chat_repo import ChatRepository
+from services.ai.agent_service import AgentService
 
 router = APIRouter()
 
@@ -36,12 +35,12 @@ class MessageSchema(BaseModel):
 
 
 @router.post("/chat", response_model=ChatResponse)
-def ai_chat(payload: ChatRequest, db: Session = Depends(get_db)):
-    answer = AgentService.run_agent(db, payload.session_id, payload.question)
+async def ai_chat(payload: ChatRequest, db: Session = Depends(get_db)):
+    answer = await AgentService.run_agent(db, payload.session_id, payload.question)
     return ChatResponse(answer=answer)
 
 
-@router.get("/history/{session_id}", response_model=List[MessageSchema])
+@router.get("/history/{session_id}", response_model=list[MessageSchema])
 def get_chat_history(session_id: str, db: Session = Depends(get_db)):
     history = ChatRepository.get_history(db, session_id)
     return history

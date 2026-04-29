@@ -13,7 +13,7 @@ def seed_sample_products():
                     "price": 149,
                     "category": "Burgers",
                     "stock": 15,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Chicken Cheese Burger",
@@ -21,7 +21,7 @@ def seed_sample_products():
                     "price": 199,
                     "category": "Burgers",
                     "stock": 10,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Margherita Pizza",
@@ -29,7 +29,7 @@ def seed_sample_products():
                     "price": 299,
                     "category": "Pizzas",
                     "stock": 5,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Pepperoni Feast",
@@ -37,7 +37,7 @@ def seed_sample_products():
                     "price": 449,
                     "category": "Pizzas",
                     "stock": 0,  # Mocking out of stock for testing
-                    "is_available": 0
+                    "is_available": 0,
                 },
                 {
                     "name": "Hyderabadi Chicken Biryani",
@@ -45,7 +45,7 @@ def seed_sample_products():
                     "price": 349,
                     "category": "Main Course",
                     "stock": 20,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Paneer Butter Masala",
@@ -53,7 +53,7 @@ def seed_sample_products():
                     "price": 279,
                     "category": "Main Course",
                     "stock": 12,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "French Fries",
@@ -61,7 +61,7 @@ def seed_sample_products():
                     "price": 99,
                     "category": "Sides",
                     "stock": 30,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Garlic Bread",
@@ -69,7 +69,7 @@ def seed_sample_products():
                     "price": 129,
                     "category": "Sides",
                     "stock": 25,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Chocolate Lava Cake",
@@ -77,7 +77,7 @@ def seed_sample_products():
                     "price": 149,
                     "category": "Desserts",
                     "stock": 8,
-                    "is_available": 1
+                    "is_available": 1,
                 },
                 {
                     "name": "Fresh Lime Soda",
@@ -85,7 +85,7 @@ def seed_sample_products():
                     "price": 79,
                     "category": "Beverages",
                     "stock": 40,
-                    "is_available": 1
+                    "is_available": 1,
                 },
             ]
 

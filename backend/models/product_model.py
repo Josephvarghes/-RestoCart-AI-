@@ -12,4 +12,4 @@ class Product(Base):
     price = Column(Float)
     category = Column(String, default="General")
     stock = Column(Integer, default=10)
-    is_available = Column(Integer, default=1)  
+    is_available = Column(Integer, default=1)
