@@ -57,46 +57,54 @@ def process_order(items_json: str) -> str:
     """
     db = SessionLocal()
     try:
-        # AI might sometimes send the string with extra quotes or as a raw string
         items = json.loads(items_json)
         if not items:
             return "Error: No items provided in the order."
             
+        # 1. Normalize and Batch Fetch Products
+        # Extract names from items
+        names = []
+        for item in items:
+            name = item.get("name") or item.get("item") or item.get("product")
+            if name:
+                names.append(name)
+        
+        if not names:
+            return "Error: No valid item names found in the order."
+
+        # Fetch all products in one go with row-level locking if possible (SQLite doesn't support with_for_update well but it's good practice)
+        # For SQLite, we rely on the transaction serializability.
+        products = db.query(Product).filter(Product.name.in_(names)).all()
+        product_map = {p.name.lower(): p for p in products}
+        
         order_ids = []
         ordered_item_details = []
         
-        # 1. Validation & Preparation
+        # 2. Transactional Validation & Update
         for raw_item in items:
-            # Defensive key extraction
-            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
+            name_input = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
             quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
             
-            if not name:
-                return f"Error: Item name missing in one of the products: {raw_item}"
-
-            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
+            product = product_map.get(name_input.lower())
             if not product:
-                return f"Error: Product '{name}' not found in our menu."
+                # Fallback to ilike if direct match fails (less efficient but keeps robustness)
+                product = db.query(Product).filter(Product.name.ilike(f"%{name_input}%")).first()
+                if not product:
+                    return f"Error: Product '{name_input}' not found in our menu."
             
             if product.stock < quantity:
                 return f"Error: Insufficient stock for '{product.name}'. Available: {product.stock}, Requested: {quantity}."
             
-            # Map quantities to repeated IDs for the current CSV schema
-            for _ in range(quantity):
-                order_ids.append(str(product.id))
-            
-            ordered_item_details.append(f"{quantity}x {product.name}")
-        
-        # 2. Transactional Update
-        for raw_item in items:
-            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
-            quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
-            
-            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
+            # Atomic update
             product.stock -= quantity
             if product.stock <= 0:
                 product.stock = 0
                 product.is_available = 0
+            
+            # Record details
+            for _ in range(quantity):
+                order_ids.append(str(product.id))
+            ordered_item_details.append(f"{quantity}x {product.name}")
         
         new_order = Order(
             product_ids=",".join(order_ids)
@@ -124,16 +132,26 @@ def calculate_bill(items_json: str) -> str:
     db = SessionLocal()
     try:
         items = json.loads(items_json)
+        
+        # 1. Batch Fetch
+        names = [i.get("name") or i.get("item") or i.get("product") for i in items if i.get("name") or i.get("item") or i.get("product")]
+        products = db.query(Product).filter(Product.name.in_(names)).all()
+        product_map = {p.name.lower(): p for p in products}
+
         total = 0
         details = []
         for raw_item in items:
-            name = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
+            name_input = raw_item.get("name") or raw_item.get("item") or raw_item.get("product")
             quantity = raw_item.get("quantity") or raw_item.get("qty") or 1
             
-            if not name:
+            if not name_input:
                 continue
 
-            product = db.query(Product).filter(Product.name.ilike(f"%{name}%")).first()
+            product = product_map.get(name_input.lower())
+            if not product:
+                 # Fallback
+                 product = db.query(Product).filter(Product.name.ilike(f"%{name_input}%")).first()
+
             if product:
                 item_total = product.price * quantity
                 total += item_total
