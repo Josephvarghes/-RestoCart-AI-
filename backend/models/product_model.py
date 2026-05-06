@@ -11,3 +11,5 @@ class Product(Base):
     description = Column(String)
     price = Column(Float)
     category = Column(String, default="General")
+    stock = Column(Integer, default=10)
+    is_available = Column(Integer, default=1)

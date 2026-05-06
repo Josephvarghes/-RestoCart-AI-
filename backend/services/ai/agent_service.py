@@ -1,0 +1,85 @@
+from langchain_classic.agents import AgentExecutor, create_openai_tools_agent
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_groq import ChatGroq
+from sqlalchemy.orm import Session
+
+from core.config import settings
+from repositories.chat_repo import ChatRepository
+from services.ai.tools import (
+    calculate_bill,
+    check_inventory,
+    fetch_kitchen_load,
+    process_order,
+)
+
+
+class AgentService:
+    _executor: AgentExecutor | None = None
+
+    @classmethod
+    def get_agent_executor(cls):
+        if cls._executor is None:
+            llm = ChatGroq(
+                model=settings.LLM_MODEL_NAME,
+                api_key=settings.GROQ_API_KEY,
+                temperature=0.1,
+            )
+
+            tools = [check_inventory, fetch_kitchen_load, process_order, calculate_bill]
+
+            prompt = ChatPromptTemplate.from_messages(
+                [
+                    (
+                        "system",
+                        """You are the 'Resto-Manager' AI for RestoPulse. 
+                Your goal is to assist customers with orders while managing restaurant constraints.
+                
+                TOOL USAGE RULES:
+                - When calling 'calculate_bill' or 'process_order', ALWAYS provide the input as a JSON string representing a list of items.
+                - FORMAT: '[[{{"name": "Dish Name", "quantity": 1}}]]'
+                - Use the EXACT names found in the menu.
+                
+                DECISION LOGIC:
+                1. Always check 'fetch_kitchen_load' before confirming any large or complex order.
+                2. Always 'check_inventory' for every item requested by the user.
+                3. If kitchen load is HIGH (>70%), politely warn the user of delays and suggest faster alternatives (like 'Sides' or 'Beverages').
+                4. If an item is 'Out of Stock', recommend a similar dish from the same category.
+                5. If valid, use 'calculate_bill' to show the total before asking for final 'process_order' confirmation.
+                6. Be professional, helpful, and concise. 
+                7. Use tools ONLY when needed. If the user is just saying 'hi', respond normally without tools.""",
+                    ),
+                    MessagesPlaceholder(variable_name="chat_history"),
+                    ("human", "{input}"),
+                    MessagesPlaceholder(variable_name="agent_scratchpad"),
+                ]
+            )
+
+            agent = create_openai_tools_agent(llm, tools, prompt)
+            cls._executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        return cls._executor
+
+    @staticmethod
+    async def run_agent(db: Session, session_id: str, user_input: str):
+        # 1. Fetch History
+        db_history = ChatRepository.get_history(db, session_id)
+        chat_history = []
+        for msg in db_history:
+            if msg.role == "user":
+                chat_history.append(HumanMessage(content=msg.content))
+            else:
+                chat_history.append(AIMessage(content=msg.content))
+
+        # 2. Run Executor
+        executor = AgentService.get_agent_executor()
+        response = await executor.ainvoke(
+            {"input": user_input, "chat_history": chat_history}
+        )
+
+        answer = response["output"]
+
+        # 3. Persist Messages
+        ChatRepository.add_message(db, session_id, "user", user_input)
+        ChatRepository.add_message(db, session_id, "assistant", answer)
+
+        return answer
