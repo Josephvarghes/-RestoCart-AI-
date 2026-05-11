@@ -1,4 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
+import toast from "react-hot-toast";
+import { MessageCircle, X } from "lucide-react";
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,7 +30,6 @@ export default function ChatWidget() {
     }
   }, [API_BASE_URL, sessionId]);
 
-  // Initialize Session
   useEffect(() => {
     let id = localStorage.getItem("chat_session_id");
     if (!id) {
@@ -37,16 +39,13 @@ export default function ChatWidget() {
     setSessionId(id);
   }, []);
 
-  // Fetch History when sessionId is ready
   useEffect(() => {
     fetchHistory();
   }, [fetchHistory]);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading, scrollToBottom]);
-
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -69,11 +68,21 @@ export default function ChatWidget() {
       const data = await res.json();
       const aiMessage = { role: "assistant", content: data.answer };
       setMessages((prev) => [...prev, aiMessage]);
+      
+      // If the AI confirms an order was placed, show a global toast!
+      if (data.answer.toLowerCase().includes("order has been placed") || data.answer.toLowerCase().includes("order placed successfully")) {
+        toast.success("🎉 Order placed successfully via AI!", {
+          duration: 5000,
+          position: "top-center"
+        });
+      }
+
     } catch (err) {
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: "Sorry, I couldn't reach the AI right now." },
       ]);
+      toast.error("Failed to connect to the AI Assistant.");
     } finally {
       setIsLoading(false);
     }
@@ -83,66 +92,81 @@ export default function ChatWidget() {
 
   return (
     <>
-      {/* Floating Button */}
       <button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition z-50"
+        className="fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-blue-700 hover:scale-105 transition-all duration-300 z-50 flex items-center justify-center"
       >
-        💬
+        {isOpen ? <X size={24} /> : <MessageCircle size={24} />}
       </button>
 
-      {/* Chat Panel */}
       <div
-        className={`fixed bottom-0 right-0 w-96 h-[500px] bg-white border-l border-gray-200 shadow-xl transform transition-transform duration-300 ease-in-out z-40 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed bottom-24 right-6 w-96 h-[550px] bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 flex flex-col transform transition-all duration-300 origin-bottom-right z-40 ${
+          isOpen ? "scale-100 opacity-100" : "scale-0 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="p-4 border-b flex justify-between items-center bg-blue-600 text-white">
-          <h3 className="font-bold">RestoPulse AI Assistant</h3>
-          <button onClick={toggleChat} className="text-white hover:text-gray-200">
-            ✕
+        <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-white/80 backdrop-blur-md rounded-t-2xl">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+            <h3 className="font-bold text-slate-800">AI Assistant</h3>
+          </div>
+          <button onClick={toggleChat} className="text-slate-400 hover:text-slate-600 transition-colors">
+            <X size={20} />
           </button>
         </div>
 
-        {/* Messages */}
-        <div className="p-4 h-[calc(100%-120px)] overflow-y-auto space-y-4">
+        <div className="p-4 flex-1 overflow-y-auto space-y-4 bg-slate-50">
+          {messages.length === 0 && !isLoading && (
+            <div className="text-center text-slate-400 mt-20">
+              <MessageCircle size={48} className="mx-auto mb-2 opacity-50" />
+              <p>Ask me about the menu or place an order!</p>
+            </div>
+          )}
           {messages.map((msg, i) => (
             <div
               key={i}
-              className={`p-3 rounded-lg max-w-[80%] shadow-sm ${
+              className={`p-3 rounded-2xl max-w-[85%] shadow-sm text-sm ${
                 msg.role === "user"
-                  ? "bg-blue-500 text-white ml-auto"
-                  : "bg-gray-100 text-gray-800"
+                  ? "bg-blue-600 text-white ml-auto rounded-br-none"
+                  : "bg-white text-slate-700 border border-gray-100 rounded-bl-none"
               }`}
             >
-              {msg.content}
+              {msg.role === "assistant" ? (
+                <div className="prose prose-sm prose-slate max-w-none">
+                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                </div>
+              ) : (
+                msg.content
+              )}
             </div>
           ))}
           {isLoading && (
-            <div className="p-3 bg-gray-100 rounded-lg text-gray-500 italic">
-              🤖 Resto-Manager is thinking...
+            <div className="p-3 bg-white border border-gray-100 rounded-2xl rounded-bl-none max-w-[85%] shadow-sm flex items-center gap-1 w-16">
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+              <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
-        <div className="p-4 border-t flex gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-            placeholder="Ask about products or place an order..."
-            className="flex-1 border p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={!input.trim() || isLoading}
-            className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50 hover:bg-blue-700 transition"
-          >
-            Send
-          </button>
+        <div className="p-4 bg-white border-t border-gray-100 rounded-b-2xl">
+          <div className="flex gap-2 bg-slate-50 rounded-xl p-1 border border-gray-200 focus-within:border-blue-400 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+              placeholder="Type a message..."
+              className="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none text-slate-700"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || isLoading}
+              className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50 hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              Send
+            </button>
+          </div>
         </div>
       </div>
     </>
