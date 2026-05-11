@@ -11,6 +11,6 @@ return res.data;
 
 
 export const placeOrder = async (data) => {
-const res = await axios.post(`${API_BASE}/orders`, data);
-return res.data;
+  const res = await axios.post(`${API_BASE}/orders/`, data);
+  return res.data;
 };

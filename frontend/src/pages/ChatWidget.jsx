@@ -66,16 +66,22 @@ export default function ChatWidget() {
       });
 
       const data = await res.json();
-      const aiMessage = { role: "assistant", content: data.answer };
-      setMessages((prev) => [...prev, aiMessage]);
       
-      // If the AI confirms an order was placed, show a global toast!
-      if (data.answer.toLowerCase().includes("order has been placed") || data.answer.toLowerCase().includes("order placed successfully")) {
+      let finalAnswer = data.answer;
+      
+      // Check for the deterministic tag indicating a successful order
+      if (finalAnswer.includes("[ORDER_SUCCESS]")) {
         toast.success("🎉 Order placed successfully via AI!", {
           duration: 5000,
           position: "top-center"
         });
+        
+        // Remove the tag so the user doesn't see it in the chat bubble
+        finalAnswer = finalAnswer.replace("[ORDER_SUCCESS]", "").trim();
       }
+
+      const aiMessage = { role: "assistant", content: finalAnswer };
+      setMessages((prev) => [...prev, aiMessage]);
 
     } catch (err) {
       setMessages((prev) => [

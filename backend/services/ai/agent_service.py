@@ -46,8 +46,9 @@ class AgentService:
                 3. If kitchen load is HIGH (>70%), politely warn the user of delays and suggest faster alternatives (like 'Sides' or 'Beverages').
                 4. If an item is 'Out of Stock', recommend a similar dish from the same category.
                 5. If valid, use 'calculate_bill' to show the total before asking for final 'process_order' confirmation.
-                6. Be professional, helpful, and concise. 
-                7. Use tools ONLY when needed. If the user is just saying 'hi', respond normally without tools.""",
+                6. If you successfully execute the 'process_order' tool, you MUST include the exact string '[ORDER_SUCCESS]' anywhere in your final response to the user.
+                7. Be professional, helpful, and concise. 
+                8. Use tools ONLY when needed. If the user is just saying 'hi', respond normally without tools.""",
                     ),
                     MessagesPlaceholder(variable_name="chat_history"),
                     ("human", "{input}"),
